@@ -5,15 +5,17 @@ This repository implements some time-series prediction models (CNN-LSTM, Transfo
 ## Dataset
 
 Datasets can be obtained from NSRDB-NREL website :- https://maps.nrel.gov/nsrdb-viewer/
+...
 India data files:-   https://drive.google.com/drive/folders/1H2FX0GsT2iRz56qEnC9naMfb_dL_i_tW
     Summer files:-   https://drive.google.com/drive/folders/1Yc3CVJ5SYwo-oU01dHEGxEwGC_kgChaP
     Winter files:-   https://drive.google.com/drive/folders/1--B9E6XafqD2W8PY-y9jxDLzhZ3qnVXo
     Monsoon files:-  https://drive.google.com/drive/folders/1-1r9iFt6spgjD8dYlk75ZiDVj0aS3qe2
+...
 Arizona data files:- https://drive.google.com/drive/folders/1oKmAgYywSC_Ffwbp_ZZJVrTFuNL3rl8K
    Summer files:-    https://drive.google.com/drive/folders/1-M3qDNvnn3C92AHM-sJtWdLxKUGaYhYm
    Winter files:-    https://drive.google.com/drive/folders/1-NpWuWzgYMOy2-OlBoTRL2xyl95YnHbV
    Spring files:-    https://drive.google.com/drive/folders/1-RDV3Htrh_Xp_5EY6Vy5tNZNWEvNQHqH
-
+...
 ## Preprocessing
 
 Each data file must correspond to an year. You can choose the training , testing and validation files. Various averages are calculated over the data in the training files and subtracted from the original data, obtaining residuals which are encapsulate information relatively(relative to original data) independent of time based phenomenons like seasons, day and night etc. The model is trained on this data. The below command will perform pre-processing :-
