@@ -86,7 +86,11 @@ elif args.model=='trfrmr' :
 elif args.model=='lstm' :
     from Models import LSTM
     t = LSTM.lstm(seq_len = seq_len, ini_len=args.ini_len, final_len=model_final_len).to(device)
-
+   
+elif args.model=='lstm_a' :
+    from Models import lstm_attention
+    t = LSTM.lstm_a(seq_len = seq_len, ini_len=args.ini_len, final_len=model_final_len).to(device)
+   
 if path.exists(args.param_file) :
     t.load_state_dict(torch.load(args.param_file))
 
