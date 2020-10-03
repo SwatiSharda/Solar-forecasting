@@ -1,9 +1,22 @@
 
 import torch.nn as nn
 import torch
-
+from attention import Attention
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+def attention_cnn_lstm(inputs):
+    # inputs.shape = (batch_size, time_steps, input_dim)
+    print(inputs.shape)
+    input_dim = int(inputs.shape[2])
+    a = Permute((2, 1))(inputs)
+    time_steps = 3
+    a = Reshape((input_dim, time_steps))(a) # this line is not useful. It's just to know which dimension is what.
+    a = Dense(time_steps, activation='softmax')(a)
+    if single:
+        a = Lambda(lambda x: K.mean(x, axis=1), name='dim_reduction')(a)
+        a = RepeatVector(input_dim)(a)
+    a_probs = Permute((2, 1), name='attention_vec')(a)
+    attention_m = multiply([inputs, a_probs])
+    return attention_m
 class cnn_lstm(nn.Module) :
     def __init__(self,seq_len=128, ini_len=18, final_len=1) :
         super().__init__()
@@ -19,7 +32,10 @@ class cnn_lstm(nn.Module) :
                                  nn.MaxPool1d(2,2),
                                  nn.Conv1d(16,self.d_model,4,1))
         self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,batch_first=True)
-        self.final = nn.Sequential(nn.Linear(self.hidden_size*56,512),nn.ReLU(),nn.Linear(512,final_len))
+        attention_m = attention_cnn_lstm(self.lstm)
+        attention_m = Flatten()(attention_m) 
+        self.final = Dense(units=1) (attention_m)
+        
     
     def forward(self,batch) :
         batch = self.cnn(self.batch_norm(self.init_trnsfrm(batch).transpose(1,2))).transpose(1,2)
@@ -27,3 +43,6 @@ class cnn_lstm(nn.Module) :
         del h_n,c_n
         out = self.final(batch.reshape(-1,self.hidden_size*56))
         return out
+
+
+
