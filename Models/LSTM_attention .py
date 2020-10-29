@@ -17,7 +17,7 @@ def attention_lstm(inputs):
     input_dim = int(inputs.shape[2])
     a = Permute((2, 1))(inputs)
     time_steps = 3
-    a = Reshape((input_dim, time_steps))(a) # this line is not useful. It's just to know which dimension is what.
+    a = Reshape((input_dim, time_steps))(a)
     a = Dense(time_steps, activation='softmax')(a)
     if single:
         a = Lambda(lambda x: K.mean(x, axis=1), name='dim_reduction')(a)
