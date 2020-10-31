@@ -9,6 +9,8 @@ Original file is located at
 
 import torch.nn as nn
 import torch
+from torch.nn import functional as F
+from torch.autograd import Variable
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -19,9 +21,9 @@ class lstm_a(nn.Module) :
         self.seq_len = seq_len
         self.hidden_size = 32
         self.num_layers = 1
-        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,return_sequences=True, batch_first=True)
-        self.W_s1 = nn.Linear(2*self.hidden_size, 350)
-		self.W_s2 = nn.Linear(350, 30)
+        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,return_sequences=True, batch_first=True, bidirectional=True)
+        self.W_s1 = nn.Linear(self.hidden_size*self.seq_len,512)
+	self.W_s2 = nn.Linear(512,final_len)
         self.final = nn.Sequential(nn.Linear(self.hidden_size*self.seq_len,512),nn.ReLU(),nn.Linear(512,final_len))
       def attention_net(self, lstm_output):
         attn_weight_matrix = self.W_s2(F.tanh(self.W_s1(lstm_output)))
