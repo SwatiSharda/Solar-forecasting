@@ -35,10 +35,11 @@ class lstm_a(nn.Module) :
         self.seq_len = seq_len
         self.hidden_size = 32
         self.num_layers = 1
-        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,bidirectional=True, batch_first=True)
+        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,return_sequences=True, batch_first=True)
+        self.attention = nn.attention_lstm(self.hidden_size+self.d_model, score_function='bi_linear')
         attention_m = attention_lstm(self.lstm)
         attention_m = Flatten()(attention_m) 
-        output = Dense(units=1) (attention_m)
+        output = Dense(1, activation = 'linear')
         # self.final = nn.Sequential(nn.Linear(self.hidden_size*self.seq_len,512),nn.ReLU(),nn.Linear(512,final_len))
     
     def forward(self,batch) :
