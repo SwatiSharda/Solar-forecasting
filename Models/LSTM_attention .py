@@ -9,23 +9,7 @@ Original file is located at
 
 import torch.nn as nn
 import torch
-from attention import Attention
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-def attention_lstm(inputs):
-    # inputs.shape = (batch_size, time_steps, input_dim)
-    print(inputs.shape)
-    input_dim = int(inputs.shape[2])
-    a = Permute((2, 1))(inputs)
-    time_steps = 3
-    a = Reshape((input_dim, time_steps))(a)
-    a = Dense(time_steps, activation='softmax')(a)
-    if single:
-        a = Lambda(lambda x: K.mean(x, axis=1), name='dim_reduction')(a)
-        a = RepeatVector(input_dim)(a)
-    a_probs = Permute((2, 1), name='attention_vec')(a)
-    attention_m = multiply([inputs, a_probs])
-    return attention_m
-
 
 
 class lstm_a(nn.Module) :
@@ -36,14 +20,20 @@ class lstm_a(nn.Module) :
         self.hidden_size = 32
         self.num_layers = 1
         self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,return_sequences=True, batch_first=True)
-        self.attention = nn.attention_lstm(self.hidden_size+self.d_model, score_function='bi_linear')
-        attention_m = attention_lstm(self.lstm)
-        attention_m = Flatten()(attention_m) 
-        output = Dense(1, activation = 'linear')
-        # self.final = nn.Sequential(nn.Linear(self.hidden_size*self.seq_len,512),nn.ReLU(),nn.Linear(512,final_len))
+        self.W_s1 = nn.Linear(2*self.hidden_size, 350)
+		self.W_s2 = nn.Linear(350, 30)
+        self.final = nn.Sequential(nn.Linear(self.hidden_size*self.seq_len,512),nn.ReLU(),nn.Linear(512,final_len))
+      def attention_net(self, lstm_output):
+        attn_weight_matrix = self.W_s2(F.tanh(self.W_s1(lstm_output)))
+		attn_weight_matrix = attn_weight_matrix.permute(0, 2, 1)
+		attn_weight_matrix = F.softmax(attn_weight_matrix, dim=2)
+
+		return attn_weight_matrix
     
     def forward(self,batch) :
-        batch, (_b,_a) = self.lstm_a( batch )
-        del _b, _a
-        out = self.final(batch.reshape(-1,self.hidden_size*self.seq_len))
+        output, (_b,_a) = self.lstm_a( batch )
+        output = output.permute(1, 0, 2)
+        attn_weight_matrix = self.attention_net(output)
+        hidden_matrix = torch.bmm(attn_weight_matrix, output)
+        out = self.final(hidden_matrix.reshape(-1,self.hidden_size*self.seq_len)                                                                                        
         return out
