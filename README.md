@@ -1,6 +1,6 @@
 # GHI-prediction
 
-This repository implements some time-series prediction models (CNN-LSTM, Transformer, AR-Net, LSTM) for predicting GHI-values in various ways.
+Global horizontal irradiance forecasting based on various weather parameters has been implemented using RNNs (LSTM, CNN-LSTM), attention based RNNs (Attention-LSTM, Attention-CNN-LSTM) and multi-head self attention based Transformer model (Transformer). Performance metrics(RMSE, MAE, MBE) has been evaluated for comparative analysis of all models. Transformer model outperforms all other models in terms of performance metrics as well as time and space complexity. 
 
 ## Dataset
 
@@ -19,7 +19,7 @@ Arizona data files:- https://drive.google.com/drive/folders/1oKmAgYywSC_Ffwbp_ZZ
 ```
 ## Preprocessing
 
-Each data file must correspond to an year. You can choose the training , testing and validation files. Various averages are calculated over the data in the training files and subtracted from the original data, obtaining residuals which are encapsulate information relatively(relative to original data) independent of time based phenomenons like seasons, day and night etc. The model is trained on this data. The below command will perform pre-processing :-
+The data preprocessing has been applied to yearly data files of any location obtained from NREL website. Various averages are calculated over the data in the training files and subtracted from the original data, obtaining residuals which are encapsulate information relatively(relative to original data) independent of time based phenomenons like seasons, day and night etc. The model is trained on this data. The below command will perform pre-processing :-
 
 ```
 python DataSet/MakingData.py --csv_prefix <common-prefix-for-all-downloaded-data-files> --tar_dir <directory-to-store-new-data-files>\
@@ -111,7 +111,7 @@ python shift_ghi.py --ghi_time_file <pickle-file-path> --write_to <append|out-pi
 ```
 ## Using smart_persistence.py (Baseline Model)
 
-1.) Provides smart persistence [Pedro and Coimbra, 2012](https://www.sciencedirect.com/science/article/abs/pii/S0038092X12001429) predictions and accuracy metrics.
+1.) smart persistence model [Pedro and Coimbra, 2012](https://www.sciencedirect.com/science/article/abs/pii/S0038092X12001429) predictions and accuracy metrics.
 
 ```
 python smart_persistence.py --loss <mse|mae|mbe|mape> --tr_start_year <training-start-year>
