@@ -35,7 +35,7 @@ class lstm_a(nn.Module) :
         self.seq_len = seq_len
         self.hidden_size = 32
         self.num_layers = 1
-        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,batch_first=True)
+        self.lstm = nn.LSTM(self.d_model,self.hidden_size,self.num_layers,bidirectional=True, batch_first=True)
         attention_m = attention_lstm(self.lstm)
         attention_m = Flatten()(attention_m) 
         output = Dense(units=1) (attention_m)
